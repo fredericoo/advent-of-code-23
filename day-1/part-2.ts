@@ -24,11 +24,6 @@ const NUMBER_STRING_TO_VALUE = {
 	zero: '0',
 };
 
-const logAndPassThrough = <T>(input: T) => {
-	console.log(input);
-	return input;
-};
-
 const VALID_NUMBERS = Object.keys(NUMBER_STRING_TO_VALUE);
 
 const getEdgeNumbers = (input: string) =>
@@ -47,7 +42,6 @@ const getEdgeNumbers = (input: string) =>
 		// convert to number
 		map(n => NUMBER_STRING_TO_VALUE[n] as string),
 		a => a.join(''),
-		logAndPassThrough,
 		Number,
 	);
 
