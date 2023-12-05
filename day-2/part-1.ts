@@ -1,5 +1,5 @@
 import { filter, map, pipe, reduce, sumBy } from 'remeda';
-import { logAndPassThrough } from '../lib/utils';
+import invariant, { logAndPassThrough } from '../lib/utils';
 import { input } from './input';
 
 const cubeColours = ['red', 'green', 'blue'] as const;
@@ -12,10 +12,13 @@ const handfulStringToObj = (handfulString: string) =>
 		handfulString,
 		s => s.split(', '),
 		map(cubePick => pipe(cubePick, s => s.split(' '))),
-		reduce((acc, [count, colour]) => ({ ...acc, [colour]: Number(count) }), { red: 0, green: 0, blue: 0 } as Record<
-			CubeColour,
-			number
-		>),
+		reduce(
+			(acc, [count, colour]) => {
+				if (!colour) return acc;
+				return { ...acc, [colour]: Number(count) };
+			},
+			{ red: 0, green: 0, blue: 0 } as Record<CubeColour, number>,
+		),
 	);
 
 const gameInputsToHandfuls = (gameInputs: string) => pipe(gameInputs, s => s.split('; '), map(handfulStringToObj));
@@ -23,7 +26,12 @@ const gameInputsToHandfuls = (gameInputs: string) => pipe(gameInputs, s => s.spl
 const stringToGame = (input: string) =>
 	pipe(
 		input,
-		s => s.split(': '),
+		s => {
+			const [gameString, gameInput] = s.split(': ');
+			invariant(gameString);
+			invariant(gameInput);
+			return [gameString, gameInput] as const;
+		},
 		([gameString, gameInput]) => [replaceAndGetNumber('Game ')(gameString), gameInputsToHandfuls(gameInput)] as const,
 	);
 
